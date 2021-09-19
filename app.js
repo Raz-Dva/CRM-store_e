@@ -1,9 +1,10 @@
+const mongoose = require('mongoose');
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const cors = require('cors');
 const morgan = require('morgan');
-const mongoose = require('mongoose');
+const passport = require('passport');
 const dotenv = require("dotenv");
 const analyticsRoutes = require('./routes/analytics');
 const categoryRoutes = require('./routes/category');
@@ -16,6 +17,9 @@ dotenv.config()
 mongoose.connect(process.env.MONGO_URL)
     .then((data) => { console.log('MongoDB is connected!!!') })
     .catch((err) => { console.log('Err! ' + err) })
+
+app.use(passport.initialize());
+require('./middleware/passport')(passport)
 
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
