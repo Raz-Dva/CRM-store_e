@@ -16,12 +16,13 @@ dotenv.config()
 
 mongoose.connect(process.env.MONGO_URL)
     .then((data) => { console.log('MongoDB is connected!!!') })
-    .catch((err) => { console.log('Err! ' + err) })
+    .catch((err) => { console.log('Error! ' + err) })
 
 app.use(passport.initialize());
 require('./middleware/passport')(passport)
 
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'))
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors())

@@ -1,29 +1,64 @@
-module.exports.getAll = (req, res) => {
-    res.status(200).json({
-        login: 'login from controller11'
-    })
+const Category = require('../models/Category');
+const Position = require('../models/Position');
+const errorHandler = require('../utils/errorHandler');
+
+module.exports.getAll = async function (req, res) {
+  try {
+    const categories = await Category.find({ user: req.user.id });
+    res.status(200).json(categories);
+  } catch (error) {
+    errorHandler(res, error)
+  }
 }
 
-module.exports.getById = (req, res) => {
-    res.status(200).json({
-        login: 'login from controller22'
-    })
+module.exports.getById = async function (req, res) {
+  try {
+    const category = await Category.findById(req.params.id);
+    res.status(200).json(category);
+  } catch (error) {
+    errorHandler(res, error)
+  }
 }
 
-module.exports.remove = (req, res) => {
+module.exports.remove = async function (req, res) {
+  try {
+    await Category.remove({ _id: req.params.id });
+    await Positive.remove({ category: req.params.id })
     res.status(200).json({
-        login: 'login from controller33'
-    })
+      success: true,
+      message: 'Category removed successfully'
+    });
+  } catch (error) {
+    errorHandler(res, error)
+  }
 }
 
-module.exports.create = (req, res) => {
-    res.status(200).json({
-        login: 'login from controller44'
-    })
+module.exports.create = async function (req, res) {
+  const category = new Category({
+    name: req.body.name,
+    user: req.user.id,
+    imgSrc: req.file ? req.file.path : ''
+  })
+  try {
+    await category.save();
+    res.status(201).json(category)
+  } catch (error) {
+    errorHandler(res, error)
+  }
 }
 
-module.exports.update = (req, res) => {
-    res.status(200).json({
-        login: 'login from controller55'
-    })
+
+module.exports.update = async function (req, res) {
+  const updated = {
+    name: req.body.name
+  };
+  if (req.file) {
+    updated.imageSrc = req.file.path
+  }
+  try {
+    const category = await Category.findOneAndUpdate({ _id: req.params.id }, { $set: updated }, { new: true });
+    res.status(200).json(category)
+  } catch (error) {
+    errorHandler(res, error)
+  }
 }
